@@ -1,5 +1,15 @@
-const { app } = require("./app.js");
+import { app } from "./app.js";
+import dotenv from "dotenv";
+import { initDatabase } from "./db/init.js";
 
-const PORT = 3000;
-app.listen(PORT);
-console.info("http://localhost:3000");
+dotenv.config();
+
+try {
+  await initDatabase();
+
+  const PORT = process.env.PORT;
+  app.listen(PORT);
+  console.info("http://localhost:3000");
+} catch (err) {
+  console.error("error connecting to database:", err);
+}

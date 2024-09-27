@@ -1,4 +1,4 @@
-import { Post } from "../db/models/post";
+import { Post } from "../db/models/post.js";
 import { z } from "zod";
 
 const postSchema = z.object({

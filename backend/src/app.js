@@ -1,9 +1,11 @@
-const express = require("express");
+import express from "express";
+import postsRoutes from "./routes/posts.js";
+
 const app = express();
-const port = 3000;
+app.use("/api/v1/posts", postsRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-exports.app = app;
+export { app };

@@ -1,8 +1,9 @@
-// const mongoose = require("mongoose");
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function initDatabase() {
-  const DATABASE_URL = "mongodb://localhost:27017/blog";
+  const DATABASE_URL = process.env.DATABASE_URL;
   mongoose
     .connect(DATABASE_URL)
     .then(console.info("Mongo connected"))
@@ -10,5 +11,3 @@ export async function initDatabase() {
       console.error("mongo failed to connect: " + err);
     });
 }
-
-// exports.initDatabase = initDatabase;
