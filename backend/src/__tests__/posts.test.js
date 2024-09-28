@@ -6,6 +6,7 @@ import {
   getAllPosts,
   updatePost,
   deletePost,
+  getPostBySeller,
 } from "../services/post.js";
 import { Post } from "../db/models/post";
 
@@ -13,7 +14,7 @@ describe("Post Service Tests", () => {
   const samplePosts = [
     {
       title: "First Post",
-      author: "Jane Doe",
+      seller: "Jane Doe",
       price: 5000,
       vehicleType: "car",
       year: 2020,
@@ -22,7 +23,7 @@ describe("Post Service Tests", () => {
     },
     {
       title: "Second Post",
-      author: "John Doe",
+      seller: "John Doe",
       price: 3000,
       vehicleType: "motorcycle",
       year: 2019,
@@ -46,7 +47,7 @@ describe("Post Service Tests", () => {
     test("with all parameters should succeed", async () => {
       const post = {
         title: "Hello Mongoose!",
-        author: "Daniel Bugl",
+        seller: "Daniel Bugl",
         price: 10000,
         vehicleType: "car",
         year: 2021,
@@ -63,7 +64,7 @@ describe("Post Service Tests", () => {
 
     test("without required fields should fail", async () => {
       const post = {
-        author: "Daniel Bugl",
+        seller: "Daniel Bugl",
       };
       try {
         await createPost(post);
@@ -93,13 +94,21 @@ describe("Post Service Tests", () => {
     });
   });
 
+  describe("Getting posts only from a certain seller", () => {
+    test("should return posts only from a certain seller", async () => {
+      const post = await getPostBySeller(createdSamplePosts[0].seller);
+      expect(post).toHaveLength(1);
+      expect(post[0].seller).toBe("Jane Doe");
+    });
+  });
+
   describe("Updating posts", () => {
     test("should update the specified property", async () => {
       await updatePost(createdSamplePosts[0]._id, {
-        author: "Updated Author",
+        seller: "Updated seller",
       });
       const updatedPost = await Post.findById(createdSamplePosts[0]._id);
-      expect(updatedPost.author).toEqual("Updated Author");
+      expect(updatedPost.seller).toEqual("Updated seller");
     });
 
     test("should throw an error if the update data is invalid", async () => {

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const postSchema = z.object({
   title: z.string(),
-  author: z.string(),
+  seller: z.string(),
   description: z.string().optional(),
   price: z.number().positive(),
   vehicleType: z.enum(["car", "motorcycle"]),
@@ -29,6 +29,7 @@ export async function createPost(post) {
     throw new Error("Invalid post data: " + parsedPost.error.message);
   }
 }
+
 export async function getPostById(postId) {
   try {
     const post = await Post.findById(postId);
@@ -38,13 +39,24 @@ export async function getPostById(postId) {
   }
 }
 
-export async function getAllPosts() {
+async function listPosts(
+  query = {},
+  { sortBy = "createdAt", sortOrder = "descending" } = {}
+) {
   try {
-    const posts = await Post.find();
-    return posts;
+    const postList = await Post.find(query).sort({ [sortBy]: sortOrder });
+    return postList;
   } catch (error) {
     throw error;
   }
+}
+
+export async function getAllPosts(options) {
+  return await listPosts({}, options);
+}
+
+export async function getPostBySeller(seller, options) {
+  return await listPosts({ seller }, options);
 }
 
 export async function updatePost(postId, updatedPost) {
