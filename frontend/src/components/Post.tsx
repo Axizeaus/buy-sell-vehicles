@@ -4,7 +4,7 @@ export default function Post(props: PostProps): React.JSX.Element {
   return (
     <div>
       <h1>{props.title}</h1>
-      <h2>Author: {props.author}</h2>
+      <h2>Seller: {props.seller}</h2>
       <p>Description: {props.description}</p>
       <p>Price: ${props.price}</p>
       <p>Vehicle Type: {props.vehicleType}</p>

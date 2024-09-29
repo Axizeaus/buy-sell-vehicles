@@ -7,7 +7,7 @@ export default function PostList({ posts }: PostListProps) {
   return (
     <>
       {posts.map((post) => (
-        <Post key={post.title} {...post} />
+        <Post key={post._id} {...post} />
       ))}
     </>
   );

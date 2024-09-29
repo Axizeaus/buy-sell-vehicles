@@ -15,12 +15,14 @@ const postSchema = z.object({
 });
 
 export async function createPost(post) {
+  console.log("it reached here.");
   const parsedPost = postSchema.safeParse(post);
 
   if (parsedPost.success) {
     const newPost = new Post(parsedPost.data);
     try {
       const savedPost = await newPost.save();
+      console.log("saved post successfully.");
       return savedPost;
     } catch (error) {
       throw error;

@@ -1,13 +1,21 @@
 import React, { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createPost } from "@/api/posts";
 
 enum VehicleType {
   Car = "car",
   Motorcycle = "motorcycle",
 }
 
+interface InvalidateQueryFilters {
+  queryKey: string[];
+  staleTime?: number;
+  cacheTime?: number;
+}
+
 const CreatePost: React.FC = () => {
   const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
+  const [seller, setSeller] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [vehicleType, setVehicleType] = useState<VehicleType>(VehicleType.Car);
@@ -17,36 +25,48 @@ const CreatePost: React.FC = () => {
   const [contactInfo, setContactInfo] = useState("");
   const [images, setImages] = useState<string[]>([]);
 
+  const newPost = {
+    title,
+    seller,
+    description,
+    price: Number(price),
+    vehicleType,
+    year: Number(year),
+    mileage: mileage ? Number(mileage) : undefined,
+    location,
+    contactInfo,
+    images,
+    createdAt: new Date().toISOString(),
+  };
+  console.log(newPost);
+
+  const queryClient = useQueryClient();
+  const queryFilters: string[] = ["posts"];
+  const invalidateFilters: InvalidateQueryFilters = {
+    queryKey: queryFilters,
+  };
+  const createPostMutation = useMutation({
+    mutationFn: () => createPost(newPost),
+    onSuccess: () => queryClient.invalidateQueries(invalidateFilters),
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newPost = {
-      title,
-      author,
-      description,
-      price: Number(price),
-      vehicleType,
-      year: Number(year),
-      mileage: mileage ? Number(mileage) : undefined,
-      location,
-      contactInfo,
-      images,
-      createdAt: new Date().toISOString(),
-    };
-
     console.log(newPost);
+    createPostMutation.mutate();
 
     // onCreate(newPost);
-    setTitle("");
-    setAuthor("");
-    setDescription("");
-    setPrice("");
-    setVehicleType(VehicleType.Car);
-    setYear("");
-    setMileage("");
-    setLocation("");
-    setContactInfo("");
-    setImages([]);
+    // setTitle("");
+    // setSeller("");
+    // setDescription("");
+    // setPrice("");
+    // setVehicleType(VehicleType.Car);
+    // setYear("");
+    // setMileage("");
+    // setLocation("");
+    // setContactInfo("");
+    // setImages([]);
   };
 
   return (
@@ -62,11 +82,11 @@ const CreatePost: React.FC = () => {
         />
       </div>
       <div>
-        <label>Author:</label>
+        <label>seller:</label>
         <input
           type="text"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
+          value={seller}
+          onChange={(e) => setSeller(e.target.value)}
           required
         />
       </div>
@@ -151,7 +171,19 @@ const CreatePost: React.FC = () => {
           }
         />
       </div>
-      <button type="submit">Create Post</button>
+      <button
+        type="submit"
+        value={createPostMutation.isPending ? "Creating..." : "Create"}
+        disabled={!title || createPostMutation.isPending}
+      >
+        Create Post
+      </button>
+      {createPostMutation.isSuccess ? (
+        <>
+          <br />
+          Post created successfully
+        </>
+      ) : null}
     </form>
   );
 };
