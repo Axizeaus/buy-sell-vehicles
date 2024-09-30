@@ -4,8 +4,8 @@ export default function PostFilter({
   onChange,
 }: {
   field: String;
-  value: String | number | readonly string[] | undefined;
-  onChange: (value: String) => void;
+  value: string | number | readonly string[] | undefined;
+  onChange: (value: string) => void;
 }) {
   return (
     <div>

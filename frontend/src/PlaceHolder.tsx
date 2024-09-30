@@ -18,21 +18,22 @@ export default function Placeholder() {
   const posts = postsQuery.data ?? [];
 
   return (
-    <>
+    <div>
       <CreatePost />
+      Filter By:
       <PostFilter
         field="seller"
         value={seller}
         onChange={(value) => setSeller(value)}
       />
       <PostSorting
-        fields={["createdAt", "updatedAt"]}
+        fields={["createdAt", "updatedAt", "price"]}
         value={sortBy}
         onChange={(value) => setSortBy(value)}
         orderValue={sortOrder}
         onOrderChange={(orderValue) => setSortOrder(orderValue)}
       />
       <PostList posts={posts} />
-    </>
+    </div>
   );
 }

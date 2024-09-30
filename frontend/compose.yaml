@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  buy-sell-database:
+    image: mongo
+    ports:
+      - "27017:27017"
+  buy-sell-backend:
+    build: backend/
+    environment:
+      - PORT=3001
+      - DATABASE_URL=mongodb://host.docker.internal:27017/buy-sell-vehicles
+    ports:
+      - "3001:3001"
+    depends_on:
+      - buy-sell-database
+  buy-sell-frontend:
+    build:
+      context: .
+      args:
+        VITE_BACKEND_URL: http://localhost:3001/api/v1
+    ports:
+      - "3000:80"
+    depends_on:
+      - buy-sell-backend
