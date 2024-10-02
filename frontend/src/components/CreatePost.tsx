@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPost } from "@/api/posts";
+import { useAuth } from "@/contexts/AuthContext";
 
 enum VehicleType {
   Car = "car",
@@ -14,8 +15,9 @@ interface InvalidateQueryFilters {
 }
 
 const CreatePost: React.FC = () => {
+  const [token] = useAuth();
+
   const [title, setTitle] = useState("");
-  const [seller, setSeller] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [vehicleType, setVehicleType] = useState<VehicleType>(VehicleType.Car);
@@ -27,7 +29,6 @@ const CreatePost: React.FC = () => {
 
   const newPost = {
     title,
-    seller,
     description,
     price: Number(price),
     vehicleType,
@@ -45,8 +46,15 @@ const CreatePost: React.FC = () => {
   const invalidateFilters: InvalidateQueryFilters = {
     queryKey: queryFilters,
   };
+
   const createPostMutation = useMutation({
-    mutationFn: () => createPost(newPost),
+    mutationFn: () => {
+      if (token !== null) {
+        return createPost(token, newPost);
+      } else {
+        return Promise.reject(new Error("Token is required"));
+      }
+    },
     onSuccess: () => queryClient.invalidateQueries(invalidateFilters),
   });
 
@@ -56,18 +64,20 @@ const CreatePost: React.FC = () => {
     console.log(newPost);
     createPostMutation.mutate();
 
-    // onCreate(newPost);
-    // setTitle("");
-    // setSeller("");
-    // setDescription("");
-    // setPrice("");
-    // setVehicleType(VehicleType.Car);
-    // setYear("");
-    // setMileage("");
-    // setLocation("");
-    // setContactInfo("");
-    // setImages([]);
+    setTitle("");
+    setDescription("");
+    setPrice("");
+    setVehicleType(VehicleType.Car);
+    setYear("");
+    setMileage("");
+    setLocation("");
+    setContactInfo("");
+    setImages([]);
   };
+
+  if (!token) {
+    return <div>Please log in to create a new post.</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -78,15 +88,6 @@ const CreatePost: React.FC = () => {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>seller:</label>
-        <input
-          type="text"
-          value={seller}
-          onChange={(e) => setSeller(e.target.value)}
           required
         />
       </div>

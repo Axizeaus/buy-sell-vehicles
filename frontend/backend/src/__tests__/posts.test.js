@@ -1,139 +1,135 @@
-import mongoose from "mongoose";
-import { describe, expect, test, beforeEach } from "@jest/globals";
 import {
   createPost,
   getPostById,
   getAllPosts,
+  getPostBySeller,
   updatePost,
   deletePost,
-  getPostBySeller,
 } from "../services/post.js";
-import { Post } from "../db/models/post";
+import { Post } from "../db/models/post.js";
+import User from "../db/models/user.js";
+import { z } from "zod";
 
-describe("Post Service Tests", () => {
-  const samplePosts = [
-    {
-      title: "First Post",
-      seller: "Jane Doe",
-      price: 5000,
-      vehicleType: "car",
-      year: 2020,
-      location: "New York",
-      contactInfo: "jane.doe@example.com",
-    },
-    {
-      title: "Second Post",
-      seller: "John Doe",
-      price: 3000,
-      vehicleType: "motorcycle",
-      year: 2019,
-      location: "Los Angeles",
-      contactInfo: "john.doe@example.com",
-    },
-  ];
+jest.mock("../db/models/post.js");
+jest.mock("../db/models/user.js");
 
-  let createdSamplePosts = [];
+describe("Post Service", () => {
+  const userId = "user123";
+  const validPost = {
+    title: "Test Post",
+    description: "A great vehicle",
+    price: 10000,
+    vehicleType: "car",
+    year: 2020,
+    mileage: 15000,
+    location: "New York",
+    contactInfo: "contact@example.com",
+    images: ["image1.jpg", "image2.jpg"],
+  };
 
-  beforeEach(async () => {
-    await Post.deleteMany({});
-    createdSamplePosts = [];
-    for (const post of samplePosts) {
-      const createdPost = new Post(post);
-      createdSamplePosts.push(await createdPost.save());
-    }
+  const invalidPost = {
+    title: "",
+    price: -100,
+    vehicleType: "plane", // Invalid vehicle type
+    year: 1800, // Invalid year
+  };
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe("Creating posts", () => {
-    test("with all parameters should succeed", async () => {
-      const post = {
-        title: "Hello Mongoose!",
-        seller: "Daniel Bugl",
-        price: 10000,
-        vehicleType: "car",
-        year: 2021,
-        location: "New York",
-        contactInfo: "contact@example.com",
-      };
-      const createdPost = await createPost(post);
-      expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId);
-      const foundPost = await Post.findById(createdPost._id);
-      expect(foundPost).toEqual(expect.objectContaining(post));
-      expect(foundPost.createdAt).toBeInstanceOf(Date);
-      expect(foundPost.updatedAt).toBeInstanceOf(Date);
+  describe("createPost", () => {
+    it("should create a post successfully", async () => {
+      Post.mockImplementation(() => ({
+        save: jest.fn().mockResolvedValue(validPost),
+      }));
+
+      const result = await createPost(userId, validPost);
+      expect(result).toEqual(validPost);
+      expect(Post).toHaveBeenCalledWith(validPost);
     });
 
-    test("without required fields should fail", async () => {
-      const post = {
-        seller: "Daniel Bugl",
-      };
-      try {
-        await createPost(post);
-      } catch (err) {
-        expect(err.message).toContain("Invalid post data:");
-      }
+    it("should throw an error for invalid post data", async () => {
+      await expect(createPost(userId, invalidPost)).rejects.toThrow(
+        "Invalid post data:"
+      );
     });
   });
 
-  describe("Listing posts", () => {
-    test("should return all posts", async () => {
-      const posts = await getAllPosts();
-      expect(posts.length).toEqual(createdSamplePosts.length);
+  describe("getPostById", () => {
+    it("should return a post by ID", async () => {
+      Post.findById.mockResolvedValue(validPost);
+      const result = await getPostById("post123");
+      expect(result).toEqual(validPost);
+    });
+
+    it("should return null if post not found", async () => {
+      Post.findById.mockResolvedValue(null);
+      const result = await getPostById("post123");
+      expect(result).toBeNull();
     });
   });
 
-  describe("Getting a post by ID", () => {
-    test("should return the full post", async () => {
-      const post = await getPostById(createdSamplePosts[0]._id);
-      expect(post.toObject()).toEqual(createdSamplePosts[0].toObject());
-    });
-
-    test("should return null if the post does not exist", async () => {
-      console.info(await getPostById(new mongoose.Types.ObjectId()));
-      const post = await getPostById(new mongoose.Types.ObjectId());
-      expect(post).toBeNull();
-    });
-  });
-
-  describe("Getting posts only from a certain seller", () => {
-    test("should return posts only from a certain seller", async () => {
-      const post = await getPostBySeller(createdSamplePosts[0].seller);
-      expect(post).toHaveLength(1);
-      expect(post[0].seller).toBe("Jane Doe");
-    });
-  });
-
-  describe("Updating posts", () => {
-    test("should update the specified property", async () => {
-      await updatePost(createdSamplePosts[0]._id, {
-        seller: "Updated seller",
+  describe("getAllPosts", () => {
+    it("should return all posts", async () => {
+      const posts = [validPost, { ...validPost, title: "Another Post" }];
+      Post.find.mockReturnValue({
+        sort: jest.fn().mockResolvedValue(posts),
       });
-      const updatedPost = await Post.findById(createdSamplePosts[0]._id);
-      expect(updatedPost.seller).toEqual("Updated seller");
-    });
 
-    test("should throw an error if the update data is invalid", async () => {
-      try {
-        await updatePost(createdSamplePosts[0]._id, { price: -500 });
-      } catch (err) {
-        expect(err.message).toContain("Invalid update data:");
-      }
+      const result = await getAllPosts();
+      expect(result).toEqual(posts);
     });
   });
 
-  describe("Deleting posts", () => {
-    test("should remove the post from the database", async () => {
-      const deletedPost = await deletePost(createdSamplePosts[0]._id);
-      expect(deletedPost._id).toEqual(createdSamplePosts[0]._id);
-      const foundPost = await Post.findById(createdSamplePosts[0]._id);
-      expect(foundPost).toBeNull();
+  describe("getPostBySeller", () => {
+    it("should return posts by seller", async () => {
+      User.findOne.mockResolvedValue({ _id: userId });
+      const posts = [validPost];
+      Post.find.mockReturnValue({
+        sort: jest.fn().mockResolvedValue(posts),
+      });
+
+      const result = await getPostBySeller("sellerUsername");
+      expect(result).toEqual(posts);
     });
 
-    test("should throw an error if the post does not exist", async () => {
-      try {
-        await deletePost(new mongoose.Types.ObjectId());
-      } catch (err) {
-        expect(err.message).toContain("Post not found");
-      }
+    it("should return an empty array if user not found", async () => {
+      User.findOne.mockResolvedValue(null);
+      const result = await getPostBySeller("nonExistentUser");
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("updatePost", () => {
+    it("should update a post successfully", async () => {
+      const updatedPost = { title: "Updated Title" };
+      Post.findOneAndUpdate.mockResolvedValue({ ...validPost, ...updatedPost });
+
+      const result = await updatePost(userId, "post123", updatedPost);
+      expect(result).toEqual({ ...validPost, ...updatedPost });
+    });
+
+    it("should throw an error for invalid update data", async () => {
+      await expect(updatePost(userId, "post123", invalidPost)).rejects.toThrow(
+        "Invalid update data:"
+      );
+    });
+
+    it("should return null if post not found", async () => {
+      Post.findOneAndUpdate.mockResolvedValue(null);
+      const result = await updatePost(userId, "post123", {
+        title: "New Title",
+      });
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("deletePost", () => {
+    it("should delete a post successfully", async () => {
+      Post.deleteOne.mockResolvedValue({ deletedCount: 1 });
+      const result = await deletePost(userId, "post123");
+      expect(result).toEqual({ deletedCount: 1 });
     });
   });
 });

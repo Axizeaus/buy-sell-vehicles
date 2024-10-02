@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const postSchema = new mongoose.Schema(
+const postSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
-    seller: { type: String, required: true },
+    seller: { type: Schema.Types.ObjectId, ref: "user", required: true },
     description: String,
     price: { type: Number, required: true, min: 0 },
     vehicleType: {

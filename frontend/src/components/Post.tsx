@@ -1,10 +1,10 @@
 import { PostProps } from "@/types";
+import User from "./User.tsx";
 
 export default function Post(props: PostProps): React.JSX.Element {
   return (
     <div>
       <h1>{props.title}</h1>
-      <h2>Seller: {props.seller}</h2>
       <p>Description: {props.description}</p>
       <p>Price: ${props.price}</p>
       <p>Vehicle Type: {props.vehicleType}</p>
@@ -28,6 +28,9 @@ export default function Post(props: PostProps): React.JSX.Element {
         </div>
       )}
       <p>Posted on: {new Date(props.createdAt).toLocaleDateString()}</p>
+      <p>
+        Posted by: <User id={props.seller} />
+      </p>
     </div>
   );
 }

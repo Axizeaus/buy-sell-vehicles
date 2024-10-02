@@ -1,9 +1,9 @@
 import { Post } from "../db/models/post.js";
+import User from "../db/models/user.js";
 import { z } from "zod";
 
 const postSchema = z.object({
   title: z.string(),
-  seller: z.string(),
   description: z.string().optional(),
   price: z.number().positive(),
   vehicleType: z.enum(["car", "motorcycle"]),
@@ -14,12 +14,13 @@ const postSchema = z.object({
   images: z.array(z.string()).optional(),
 });
 
-export async function createPost(post) {
-  console.log("it reached here.");
+export async function createPost(userId, post) {
   const parsedPost = postSchema.safeParse(post);
 
   if (parsedPost.success) {
     const newPost = new Post(parsedPost.data);
+
+    newPost.seller = userId;
     try {
       const savedPost = await newPost.save();
       console.log("saved post successfully.");
@@ -58,17 +59,23 @@ export async function getAllPosts(options) {
 }
 
 export async function getPostBySeller(seller, options) {
-  return await listPosts({ seller }, options);
+  const user = await User.findOne({ username: seller });
+  if (!user) return [];
+  return await listPosts({ seller: user._id }, options);
 }
 
-export async function updatePost(postId, updatedPost) {
+export async function updatePost(userId, postId, updatedPost) {
   const parsedPost = postSchema.partial().safeParse(updatedPost);
 
   if (parsedPost.success) {
     try {
-      const post = await Post.findByIdAndUpdate(postId, parsedPost.data, {
-        new: true,
-      });
+      const post = await Post.findOneAndUpdate(
+        { _id: postId, seller: userId },
+        { $set: parsedPost.data },
+        {
+          new: true,
+        }
+      );
       return !post ? null : post;
     } catch (error) {
       throw new Error("Error updating post: " + error.message);
@@ -78,9 +85,9 @@ export async function updatePost(postId, updatedPost) {
   }
 }
 
-export async function deletePost(postId) {
+export async function deletePost(userId, postId) {
   try {
-    const post = await Post.findByIdAndDelete(postId);
+    const post = await Post.deleteOne({ _id: postId, seller: userId });
     if (!post) {
       throw new Error("Post not found");
     }

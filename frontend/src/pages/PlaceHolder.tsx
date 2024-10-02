@@ -1,10 +1,11 @@
-import CreatePost from "./components/CreatePost";
+import CreatePost from "../components/CreatePost";
 import { useQuery } from "@tanstack/react-query";
-import { getPosts } from "./api/posts";
+import { getPosts } from "../api/posts";
 import { useState } from "react";
-import PostFilter from "./components/PostFilter";
-import PostSorting from "./components/PostSorting";
-import PostList from "./components/PostList";
+import PostFilter from "../components/PostFilter";
+import PostSorting from "../components/PostSorting";
+import PostList from "../components/PostList";
+import { Header } from "@/components/Header";
 
 export default function Placeholder() {
   const [seller, setSeller] = useState("");
@@ -19,6 +20,7 @@ export default function Placeholder() {
 
   return (
     <div>
+      <Header />
       <CreatePost />
       Filter By:
       <PostFilter

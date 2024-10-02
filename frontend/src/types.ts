@@ -21,3 +21,8 @@ export interface PostProps {
 export interface PostListProps {
   posts: PostProps[];
 }
+
+export interface User {
+  username: string;
+  password: string;
+}
