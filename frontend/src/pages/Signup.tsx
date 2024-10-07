@@ -47,6 +47,7 @@ export default function Signup() {
             <Link to="/" className="text-blue-500 hover:underline">
               Back to main page
             </Link>
+            <hr className="my-4" />
             <div className="mb-4">
               <input
                 type="text"
