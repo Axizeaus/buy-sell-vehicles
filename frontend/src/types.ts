@@ -6,7 +6,6 @@ export enum VehicleType {
 export interface PostProps {
   _id?: string;
   title: string;
-  seller: string;
   description?: string;
   price: number;
   vehicleType: VehicleType;
