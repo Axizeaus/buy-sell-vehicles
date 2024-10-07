@@ -28,9 +28,9 @@ export default function Post(props: PostProps): React.JSX.Element {
         </div>
       )}
       <p>Posted on: {new Date(props.createdAt).toLocaleDateString()}</p>
-      <p>
+      {/* <p>
         Posted by: <User id={props.seller} />
-      </p>
+      </p> */}
     </div>
   );
 }

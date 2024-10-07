@@ -5,22 +5,50 @@ import { ThemeProvider } from "./components/themeProvider";
 
 import Signup from "./pages/Signup";
 import { Login } from "./pages/Login";
-import Placeholder from "./pages/PlaceHolder";
+import MainPage from "./pages/MainPage";
+import Layout from "./components/Layout";
+import CreatePost from "./components/CreatePost";
 
 const queryClient = new QueryClient({});
-
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Placeholder />,
-  },
-  {
-    path: "/signup",
-    element: <Signup />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <MainPage />,
+      },
+      {
+        path: "signup",
+        element: <Signup />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "posts", // Base path for posts
+        children: [
+          {
+            path: "create",
+            element: <CreatePost />,
+          },
+          // {
+          //   path: ":id/edit",
+          //   element: <EditPost />,
+          // },
+          // {
+          //   path: ":id/delete",
+          //   element: <DeletePost />,
+          // },
+          // {
+          //   path: ":id",
+          //   element: <PostDetail />,
+          // },
+        ],
+      },
+    ],
   },
 ]);
 
