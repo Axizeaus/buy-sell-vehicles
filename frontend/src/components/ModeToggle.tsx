@@ -33,7 +33,7 @@ export default function ModeToggle() {
       >
         <Moon
           className={`h-[1.5rem] w-[1.5rem] transition-all duration-300 ease-in-out ${
-            theme === "dark" ? "text-gray-100" : "text-gray-500 "
+            theme === "dark" ? "text-gray-100" : "text-gray-500 opacity-50"
           }`}
         />
         <span className="sr-only">Dark Mode</span>

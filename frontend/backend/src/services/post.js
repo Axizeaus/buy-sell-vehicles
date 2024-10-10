@@ -42,26 +42,53 @@ export async function getPostById(postId) {
   }
 }
 
-async function listPosts(
-  query = {},
-  { sortBy = "createdAt", sortOrder = "descending" } = {}
-) {
+export async function getAllPosts({
+  limit = 12,
+  offset = 0,
+  sortBy = "createdAt",
+  sortOrder = "descending",
+  priceRange,
+  vehicleType,
+  location,
+} = {}) {
   try {
-    const postList = await Post.find(query).sort({ [sortBy]: sortOrder });
-    return postList;
+    // Convert limit and offset to numbers
+    limit = Number(limit);
+    offset = Number(offset);
+
+    const filterCriteria = {};
+
+    // Build filter criteria based on provided filters
+    if (priceRange) {
+      const [min, max] = priceRange.split("-").map(Number);
+      if (!isNaN(min) && !isNaN(max)) {
+        filterCriteria.price = { $gte: min, $lte: max };
+      }
+    }
+
+    if (vehicleType) {
+      filterCriteria.vehicleType = vehicleType;
+    }
+
+    if (location) {
+      filterCriteria.location = { $regex: location, $options: "i" };
+    }
+
+    console.log(filterCriteria);
+    console.log(vehicleType);
+
+    const sortOptions = { [sortBy]: sortOrder === "ascending" ? 1 : -1 };
+
+    const postList = await Post.find(filterCriteria)
+      .sort(sortOptions)
+      .skip(offset)
+      .limit(limit);
+
+    return postList || [];
   } catch (error) {
-    throw error;
+    console.error("Error retrieving all posts:", error);
+    throw new Error("Failed to retrieve posts. Please try again later.");
   }
-}
-
-export async function getAllPosts(options) {
-  return await listPosts({}, options);
-}
-
-export async function getPostBySeller(seller, options) {
-  const user = await User.findOne({ username: seller });
-  if (!user) return [];
-  return await listPosts({ seller: user._id }, options);
 }
 
 export async function updatePost(userId, postId, updatedPost) {
@@ -87,12 +114,16 @@ export async function updatePost(userId, postId, updatedPost) {
 
 export async function deletePost(userId, postId) {
   try {
-    const post = await Post.deleteOne({ _id: postId, seller: userId });
-    if (!post) {
+    const result = await Post.deleteOne({ _id: postId, seller: userId });
+
+    if (result.deletedCount === 0) {
       throw new Error("Post not found");
     }
-    return post;
+
+    return result;
   } catch (error) {
-    throw error;
+    throw new Error(
+      "An error occurred while trying to delete the post: " + error.message
+    );
   }
 }

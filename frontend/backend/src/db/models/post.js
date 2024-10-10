@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const postSchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
-    seller: { type: Schema.Types.ObjectId, ref: "user", required: true },
+    seller: { type: String, required: true },
     description: String,
     price: { type: Number, required: true, min: 0 },
     vehicleType: {
@@ -24,5 +24,17 @@ const postSchema = new Schema(
   },
   { timestamps: true }
 );
+
+postSchema.virtual("id").get(function () {
+  return this._id.toString();
+});
+
+postSchema.set("toJSON", {
+  virtuals: true,
+});
+
+postSchema.set("toObject", {
+  virtuals: true,
+});
 
 export const Post = mongoose.model("post", postSchema);

@@ -19,18 +19,24 @@ export function Login() {
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  const [, setToken] = useAuth();
+  const [token, user, setToken, setUser] = useAuth();
+
+  console.log(token, user);
 
   const loginMutation = useMutation({
     mutationFn: () => login({ username, password }),
     onSuccess: (data) => {
+      console.log(data.token.token);
+      console.log(data.token.user);
       if (data.token) {
-        setToken(data.token);
+        setToken(data.token.token);
+        setUser(data.token.user);
+        setUsername("");
+        setPassword("");
+        navigate("/");
       }
-
-      navigate("/");
     },
-    onError: () => alert("failed to login!"),
+    onError: (err: any) => alert("Failed to login!"),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -81,13 +87,10 @@ export function Login() {
             </div>
             <input
               type="submit"
-              value={loginMutation.isPending ? "Logging in..." : "Log In"}
-              disabled={!username || !password || loginMutation.isPending}
-              className={`w-full p-3 text-white rounded-md ${
-                loginMutation.isPending
-                  ? "bg-blue-300"
-                  : "bg-blue-600 hover:bg-blue-700"
-              } transition duration-200`}
+              value="login"
+              disabled={!username || !password}
+              className={`w-full p-3 text-white rounded-md  bg-blue-600 hover:bg-blue-700
+             transition duration-200`}
             />
           </form>
         </CardContent>

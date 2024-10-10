@@ -12,7 +12,26 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const posts = await getAllPosts();
+    const {
+      limit,
+      offset,
+      sortBy,
+      sortOrder,
+      priceRange,
+      vehicleType,
+      location,
+    } = req.query;
+
+    const posts = await getAllPosts({
+      limit,
+      offset,
+      sortBy,
+      sortOrder,
+      priceRange,
+      vehicleType,
+      location,
+    });
+
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ error: error.message });

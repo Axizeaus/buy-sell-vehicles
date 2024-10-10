@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPost } from "@/api/posts";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 enum VehicleType {
   Car = "car",
@@ -15,7 +16,8 @@ interface InvalidateQueryFilters {
 }
 
 const CreatePost: React.FC = () => {
-  const [token] = useAuth();
+  const [token, user] = useAuth();
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,6 +29,8 @@ const CreatePost: React.FC = () => {
   const [contactInfo, setContactInfo] = useState("");
   const [images, setImages] = useState<string[]>([]);
 
+  const seller = user?.id;
+
   const newPost = {
     title,
     description,
@@ -37,6 +41,7 @@ const CreatePost: React.FC = () => {
     location,
     contactInfo,
     images,
+    seller: "default user",
     createdAt: new Date().toISOString(),
   };
 
@@ -48,7 +53,7 @@ const CreatePost: React.FC = () => {
 
   const createPostMutation = useMutation({
     mutationFn: () => {
-      if (token !== null) {
+      if (token !== null && seller !== undefined) {
         return createPost(token, newPost);
       } else {
         return Promise.reject(new Error("Token is required"));
@@ -70,6 +75,8 @@ const CreatePost: React.FC = () => {
     setLocation("");
     setContactInfo("");
     setImages([]);
+
+    navigate("/");
   };
 
   if (!token) {

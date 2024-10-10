@@ -1,6 +1,10 @@
-import { User } from "@/types"; // Ensure this type is defined correctly
-
-export const signup = async ({ username, password }: User) => {
+export const signup = async ({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}) => {
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/signup`, {
       method: "POST",
@@ -9,18 +13,24 @@ export const signup = async ({ username, password }: User) => {
     });
 
     if (!res.ok) {
-      const errorMessage = await res.text(); // Get error message from response
+      const errorMessage = await res.text();
       throw new Error(`Failed to sign up: ${errorMessage}`);
     }
 
     return await res.json();
   } catch (error) {
     console.error("Signup error:", error);
-    throw error; // Re-throw the error after logging
+    throw error;
   }
 };
 
-export const login = async ({ username, password }: User) => {
+export const login = async ({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}) => {
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/login`, {
       method: "POST",
@@ -29,14 +39,15 @@ export const login = async ({ username, password }: User) => {
     });
 
     if (!res.ok) {
-      const errorMessage = await res.text(); // Get error message from response
+      const errorMessage = await res.text();
       throw new Error(`Failed to login: ${errorMessage}`);
     }
-
-    return await res.json();
+    const data = await res.json();
+    console.log(data);
+    return await data;
   } catch (error) {
     console.error("Login error:", error);
-    throw error; // Re-throw the error after logging
+    throw error;
   }
 };
 
@@ -49,8 +60,6 @@ export const getUserInfo = async (id: string) => {
         "Content-Type": "application/json",
       },
     });
-
-    console.log(res);
 
     if (!res.ok) {
       const errorMessage = await res.text();

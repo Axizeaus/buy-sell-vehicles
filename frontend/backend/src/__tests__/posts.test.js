@@ -2,55 +2,50 @@ import {
   createPost,
   getPostById,
   getAllPosts,
-  getPostBySeller,
   updatePost,
   deletePost,
 } from "../services/post.js";
 import { Post } from "../db/models/post.js";
-import User from "../db/models/user.js";
 import { z } from "zod";
 
 jest.mock("../db/models/post.js");
-jest.mock("../db/models/user.js");
-
-describe("Post Service", () => {
-  const userId = "user123";
-  const validPost = {
-    title: "Test Post",
-    description: "A great vehicle",
-    price: 10000,
-    vehicleType: "car",
-    year: 2020,
-    mileage: 15000,
-    location: "New York",
-    contactInfo: "contact@example.com",
-    images: ["image1.jpg", "image2.jpg"],
-  };
-
-  const invalidPost = {
-    title: "",
-    price: -100,
-    vehicleType: "plane", // Invalid vehicle type
-    year: 1800, // Invalid year
-  };
-
+describe("Post Service Functions", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   describe("createPost", () => {
     it("should create a post successfully", async () => {
-      Post.mockImplementation(() => ({
-        save: jest.fn().mockResolvedValue(validPost),
-      }));
+      const userId = "user123";
+      const postData = {
+        title: "Test Post",
+        description: "A test post description",
+        price: 1000,
+        vehicleType: "car",
+        year: 2020,
+        mileage: 15000,
+        location: "New York",
+        contactInfo: "contact@example.com",
+        images: ["image1.jpg"],
+      };
 
-      const result = await createPost(userId, validPost);
-      expect(result).toEqual(validPost);
-      expect(Post).toHaveBeenCalledWith(validPost);
+      const mockSavedPost = { ...postData, _id: "post123", seller: userId };
+      Post.prototype.save.mockResolvedValueOnce(mockSavedPost);
+
+      const savedPost = await createPost(userId, postData);
+
+      expect(savedPost).toEqual(mockSavedPost);
+      expect(Post.prototype.save).toHaveBeenCalled();
     });
 
     it("should throw an error for invalid post data", async () => {
-      await expect(createPost(userId, invalidPost)).rejects.toThrow(
+      const userId = "user123";
+      const invalidPostData = {
+        title: "Invalid Post",
+        price: -100, // Invalid price
+      };
+
+      await expect(createPost(userId, invalidPostData)).rejects.toThrow(
         "Invalid post data:"
       );
     });
@@ -58,78 +53,127 @@ describe("Post Service", () => {
 
   describe("getPostById", () => {
     it("should return a post by ID", async () => {
-      Post.findById.mockResolvedValue(validPost);
-      const result = await getPostById("post123");
-      expect(result).toEqual(validPost);
+      const mockPost = { title: "Test Post", _id: "post123" };
+      Post.findById.mockResolvedValueOnce(mockPost);
+
+      const post = await getPostById("post123");
+
+      expect(post).toEqual(mockPost);
+      expect(Post.findById).toHaveBeenCalledWith("post123");
     });
 
     it("should return null if post not found", async () => {
-      Post.findById.mockResolvedValue(null);
-      const result = await getPostById("post123");
-      expect(result).toBeNull();
+      Post.findById.mockResolvedValueOnce(null);
+
+      const post = await getPostById("post123");
+
+      expect(post).toBeNull();
     });
   });
 
   describe("getAllPosts", () => {
-    it("should return all posts", async () => {
-      const posts = [validPost, { ...validPost, title: "Another Post" }];
+    it("should return a list of posts", async () => {
+      const mockPosts = [{ title: "Post 1" }, { title: "Post 2" }];
       Post.find.mockReturnValue({
-        sort: jest.fn().mockResolvedValue(posts),
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValueOnce(mockPosts),
+          }),
+        }),
       });
 
-      const result = await getAllPosts();
-      expect(result).toEqual(posts);
-    });
-  });
+      const posts = await getAllPosts();
 
-  describe("getPostBySeller", () => {
-    it("should return posts by seller", async () => {
-      User.findOne.mockResolvedValue({ _id: userId });
-      const posts = [validPost];
+      expect(posts).toEqual(mockPosts);
+      expect(Post.find).toHaveBeenCalledWith({});
+    });
+
+    it("should handle filtering by price range", async () => {
+      const mockPosts = [{ title: "Post 1" }];
       Post.find.mockReturnValue({
-        sort: jest.fn().mockResolvedValue(posts),
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValueOnce(mockPosts),
+          }),
+        }),
       });
 
-      const result = await getPostBySeller("sellerUsername");
-      expect(result).toEqual(posts);
-    });
+      const posts = await getAllPosts({ priceRange: "100-200" });
 
-    it("should return an empty array if user not found", async () => {
-      User.findOne.mockResolvedValue(null);
-      const result = await getPostBySeller("nonExistentUser");
-      expect(result).toEqual([]);
+      expect(posts).toEqual(mockPosts);
+      expect(Post.find).toHaveBeenCalledWith({
+        price: { $gte: 100, $lte: 200 },
+      });
     });
   });
 
   describe("updatePost", () => {
     it("should update a post successfully", async () => {
-      const updatedPost = { title: "Updated Title" };
-      Post.findOneAndUpdate.mockResolvedValue({ ...validPost, ...updatedPost });
+      const userId = "user123";
+      const postId = "post123";
+      const updatedData = { title: "Updated Post" };
 
-      const result = await updatePost(userId, "post123", updatedPost);
-      expect(result).toEqual({ ...validPost, ...updatedPost });
-    });
+      const mockUpdatedPost = { ...updatedData, _id: postId, seller: userId };
+      Post.findOneAndUpdate.mockResolvedValueOnce(mockUpdatedPost);
 
-    it("should throw an error for invalid update data", async () => {
-      await expect(updatePost(userId, "post123", invalidPost)).rejects.toThrow(
-        "Invalid update data:"
+      const updatedPost = await updatePost(userId, postId, updatedData);
+
+      expect(updatedPost).toEqual(mockUpdatedPost);
+      expect(Post.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: postId, seller: userId },
+        { $set: updatedData },
+        { new: true }
       );
     });
 
-    it("should return null if post not found", async () => {
-      Post.findOneAndUpdate.mockResolvedValue(null);
-      const result = await updatePost(userId, "post123", {
-        title: "New Title",
-      });
-      expect(result).toBeNull();
+    it("should throw an error for invalid update data", async () => {
+      const userId = "user123";
+      const postId = "post123";
+      const invalidUpdateData = { price: -100 }; // Invalid price
+
+      await expect(
+        updatePost(userId, postId, invalidUpdateData)
+      ).rejects.toThrow("Invalid update data:");
+    });
+
+    it("should return null if post not found during update", async () => {
+      const userId = "user123";
+      const postId = "post123";
+      const updatedData = { title: "Updated Post" };
+
+      Post.findOneAndUpdate.mockResolvedValueOnce(null);
+
+      const updatedPost = await updatePost(userId, postId, updatedData);
+
+      expect(updatedPost).toBeNull();
     });
   });
 
   describe("deletePost", () => {
     it("should delete a post successfully", async () => {
-      Post.deleteOne.mockResolvedValue({ deletedCount: 1 });
-      const result = await deletePost(userId, "post123");
+      const userId = "user123";
+      const postId = "post123";
+
+      Post.deleteOne.mockResolvedValueOnce({ deletedCount: 1 });
+
+      const result = await deletePost(userId, postId);
+
       expect(result).toEqual({ deletedCount: 1 });
+      expect(Post.deleteOne).toHaveBeenCalledWith({
+        _id: postId,
+        seller: userId,
+      });
+    });
+
+    it("should throw an error if post not found during deletion", async () => {
+      const userId = "user123";
+      const postId = "post123";
+
+      Post.deleteOne.mockResolvedValueOnce({ deletedCount: 0 });
+
+      await expect(deletePost(userId, postId)).rejects.toThrow(
+        "Post not found"
+      );
     });
   });
 });
