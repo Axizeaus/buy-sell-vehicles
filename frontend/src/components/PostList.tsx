@@ -1,20 +1,88 @@
-import { Fragment } from "react";
 import Post from "./Post";
-import { PostListProps } from "@/types";
+import { PostProps } from "@/types";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
+} from "@/components/ui/pagination";
 
-const PostList: React.FC<PostListProps> = ({ posts }) => {
+interface PostListProps {
+  posts: PostProps[];
+  totalPosts: number;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  postsPerPage: number;
+}
+
+const PostList: React.FC<PostListProps> = ({
+  posts,
+  totalPosts,
+  onNextPage,
+  onPreviousPage,
+  currentPage,
+  setCurrentPage,
+  postsPerPage,
+}) => {
+  const totalPages = Math.ceil(totalPosts / postsPerPage);
+
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4"></h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {posts.map((post) => {
-          return (
-            <Fragment key={post._id}>
-              <Post {...post} />
-            </Fragment>
-          );
-        })}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {posts.length > 0 ? (
+          posts.map((post) => <Post key={post._id} {...post} />)
+        ) : (
+          <div className="col-span-full text-center text-gray-500 text-xl">
+            No posts available.
+          </div>
+        )}
       </div>
+      {totalPosts > postsPerPage && (
+        <div className="mt-6 flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  className={
+                    currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  }
+                  onClick={currentPage === 1 ? undefined : onPreviousPage}
+                />
+              </PaginationItem>
+
+              {/* Render page numbers */}
+              {Array.from({ length: totalPages }, (_, i) => (
+                <PaginationItem key={i + 1}>
+                  <button
+                    className={`px-3 py-1 rounded ${
+                      currentPage === i + 1
+                        ? "bg-gray-500 text-white"
+                        : "text-gray-500"
+                    }`}
+                    onClick={() => setCurrentPage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={currentPage < totalPages ? onNextPage : undefined}
+                  className={
+                    currentPage < totalPages
+                      ? ""
+                      : "opacity-50 cursor-not-allowed"
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };

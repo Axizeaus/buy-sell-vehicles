@@ -35,11 +35,11 @@ const PostFilter: React.FC<PostFilterProps> = ({
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value={`filter-${field}`}>
-        <AccordionTrigger className="text-lg font-semibold">
+        <AccordionTrigger className="text-lg md:text-xl font-semibold">
           {field}
         </AccordionTrigger>
         <AccordionContent>
-          <div className="mb-4">
+          <div className="mb-6">
             {options ? (
               <select
                 id={`filter-${field}`}
@@ -49,7 +49,7 @@ const PostFilter: React.FC<PostFilterProps> = ({
                   setInputValue(selectedValue);
                   onChange(selectedValue);
                 }}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-y-2 focus:border-yellow-500  dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               >
                 <option value="">Select {field}</option>
                 {options.map((option) => (
@@ -65,7 +65,7 @@ const PostFilter: React.FC<PostFilterProps> = ({
                 id={`filter-${field}`}
                 value={inputValue}
                 onChange={handleInputChange}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-y-2 focus:border-yellow-500  dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
                 placeholder={`Filter by ${field}`}
               />
             )}

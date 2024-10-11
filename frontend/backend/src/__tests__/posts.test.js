@@ -74,6 +74,7 @@ describe("Post Service Functions", () => {
   describe("getAllPosts", () => {
     it("should return a list of posts", async () => {
       const mockPosts = [{ title: "Post 1" }, { title: "Post 2" }];
+      const mockTotalPosts = mockPosts.length; // Total posts count
       Post.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
           skip: jest.fn().mockReturnValue({
@@ -81,15 +82,18 @@ describe("Post Service Functions", () => {
           }),
         }),
       });
+      Post.countDocuments.mockResolvedValueOnce(mockTotalPosts); // Mock total count
 
-      const posts = await getAllPosts();
+      const result = await getAllPosts();
 
-      expect(posts).toEqual(mockPosts);
+      expect(result.posts).toEqual(mockPosts); // Check posts
+      expect(result.totalPosts).toBe(mockTotalPosts); // Check total posts count
       expect(Post.find).toHaveBeenCalledWith({});
     });
 
     it("should handle filtering by price range", async () => {
       const mockPosts = [{ title: "Post 1" }];
+      const mockTotalPosts = mockPosts.length; // Total posts count
       Post.find.mockReturnValue({
         sort: jest.fn().mockReturnValue({
           skip: jest.fn().mockReturnValue({
@@ -97,10 +101,12 @@ describe("Post Service Functions", () => {
           }),
         }),
       });
+      Post.countDocuments.mockResolvedValueOnce(mockTotalPosts); // Mock total count
 
       const posts = await getAllPosts({ priceRange: "100-200" });
 
-      expect(posts).toEqual(mockPosts);
+      expect(posts.posts).toEqual(mockPosts); // Check posts
+      expect(posts.totalPosts).toBe(mockTotalPosts); // Check total posts count
       expect(Post.find).toHaveBeenCalledWith({
         price: { $gte: 100, $lte: 200 },
       });

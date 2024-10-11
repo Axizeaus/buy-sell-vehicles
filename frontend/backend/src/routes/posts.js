@@ -12,19 +12,9 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const {
-      limit,
-      offset,
-      sortBy,
-      sortOrder,
-      priceRange,
-      vehicleType,
-      location,
-    } = req.query;
+    const { sortBy, sortOrder, priceRange, vehicleType, location } = req.query;
 
     const posts = await getAllPosts({
-      limit,
-      offset,
       sortBy,
       sortOrder,
       priceRange,

@@ -43,8 +43,6 @@ export async function getPostById(postId) {
 }
 
 export async function getAllPosts({
-  limit = 12,
-  offset = 0,
   sortBy = "createdAt",
   sortOrder = "descending",
   priceRange,
@@ -52,13 +50,8 @@ export async function getAllPosts({
   location,
 } = {}) {
   try {
-    // Convert limit and offset to numbers
-    limit = Number(limit);
-    offset = Number(offset);
-
     const filterCriteria = {};
 
-    // Build filter criteria based on provided filters
     if (priceRange) {
       const [min, max] = priceRange.split("-").map(Number);
       if (!isNaN(min) && !isNaN(max)) {
@@ -74,17 +67,15 @@ export async function getAllPosts({
       filterCriteria.location = { $regex: location, $options: "i" };
     }
 
-    console.log(filterCriteria);
-    console.log(vehicleType);
-
     const sortOptions = { [sortBy]: sortOrder === "ascending" ? 1 : -1 };
 
-    const postList = await Post.find(filterCriteria)
-      .sort(sortOptions)
-      .skip(offset)
-      .limit(limit);
+    // Fetch all posts without pagination
+    const postList = await Post.find(filterCriteria).sort(sortOptions);
 
-    return postList || [];
+    // Count total posts matching the criteria
+    const totalPosts = await Post.countDocuments(filterCriteria);
+
+    return { posts: postList || [], totalPosts };
   } catch (error) {
     console.error("Error retrieving all posts:", error);
     throw new Error("Failed to retrieve posts. Please try again later.");

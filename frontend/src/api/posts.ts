@@ -8,12 +8,13 @@ interface QueryParams {
   priceRange?: string;
   vehicleType?: string;
   location?: string;
-  [key: string]: string | undefined; // Index signature
+  currentPage?: string;
+  postsPerPage?: string;
+  [key: string]: string | undefined;
 }
-
 export const getPosts = async (
   queryParams: QueryParams = {}
-): Promise<PostProps[]> => {
+): Promise<{ posts: PostProps[]; totalPosts: number }> => {
   console.log("Fetching posts with query parameters:", queryParams);
 
   try {
@@ -26,14 +27,17 @@ export const getPosts = async (
       throw new Error(`Error fetching posts: ${res.status} ${res.statusText}`);
     }
 
-    const data: PostProps[] = await res.json();
+    const data = await res.json();
 
-    if (!Array.isArray(data)) {
-      throw new Error("Invalid response format: expected an array of posts.");
+    // Ensure the response is in the expected format
+    if (!Array.isArray(data.posts) || typeof data.totalPosts !== "number") {
+      throw new Error(
+        "Invalid response format: expected an object with posts and totalPosts."
+      );
     }
 
     console.log(data);
-    return data;
+    return data; // Return the entire data object containing posts and totalPosts
   } catch (error) {
     console.error("Error in getPosts:", error);
     throw new Error("Failed to fetch posts. Please try again later.");

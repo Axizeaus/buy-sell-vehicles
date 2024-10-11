@@ -90,9 +90,12 @@ const CreatePost: React.FC = () => {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto bg-white text-gray-900 dark:bg-gray-900 dark:text-white rounded-lg shadow-lg transition-colors duration-300">
+    <div className="p-6 max-w-4xl mx-auto bg-white text-gray-900 dark:bg-gray-900 dark:text-white rounded-lg shadow-lg transition-colors duration-300">
       <h2 className="text-2xl font-bold mb-6">Create Post</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
         {/* Title Field */}
         <div>
           <label className="block mb-2 font-semibold">Title:</label>
@@ -101,17 +104,18 @@ const CreatePost: React.FC = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
         {/* Description Field */}
-        <div>
+        <div className="md:col-span-2">
           <label className="block mb-2 font-semibold">Description:</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            rows={3} // Limit the height of the textarea
           />
         </div>
 
@@ -126,7 +130,7 @@ const CreatePost: React.FC = () => {
             }
             required
             min="0"
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
@@ -136,7 +140,7 @@ const CreatePost: React.FC = () => {
           <select
             value={vehicleType}
             onChange={(e) => setVehicleType(e.target.value as VehicleType)}
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           >
             <option value={VehicleType.Car}>Car</option>
             <option value={VehicleType.Motorcycle}>Motorcycle</option>
@@ -155,7 +159,7 @@ const CreatePost: React.FC = () => {
             required
             min="1886"
             max={new Date().getFullYear()}
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
@@ -169,7 +173,7 @@ const CreatePost: React.FC = () => {
               setMileage(e.target.value ? Number(e.target.value) : "")
             }
             min="0"
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
@@ -181,7 +185,7 @@ const CreatePost: React.FC = () => {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
@@ -193,12 +197,12 @@ const CreatePost: React.FC = () => {
             value={contactInfo}
             onChange={(e) => setContactInfo(e.target.value)}
             required
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
         {/* Images Field */}
-        <div>
+        <div className="md:col-span-2">
           <label className="block mb-2 font-semibold">
             Images (comma-separated URLs):
           </label>
@@ -208,25 +212,29 @@ const CreatePost: React.FC = () => {
             onChange={(e) =>
               setImages(e.target.value.split(",").map((img) => img.trim()))
             }
-            className="border p-3 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
+            className="border p-2 rounded-lg w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white transition-colors duration-300"
           />
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className={`p-3 rounded-lg w-full ${
-            createPostMutation.isPending
-              ? "bg-gray-400"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
-          } transition-all duration-300`}
-          disabled={!title || createPostMutation.isPending}
-        >
-          {createPostMutation.isPending ? "Creating..." : "Create Post"}
-        </button>
+        <div className="md:col-span-2">
+          <button
+            type="submit"
+            className={`p-3 rounded-lg w-full ${
+              createPostMutation.isPending
+                ? "bg-gray-400"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            } transition-all duration-300`}
+            disabled={!title || createPostMutation.isPending}
+          >
+            {createPostMutation.isPending ? "Creating..." : "Create Post"}
+          </button>
+        </div>
 
         {createPostMutation.isSuccess && (
-          <div className="mt-4 text-green-500">Post created successfully!</div>
+          <div className="mt-4 text-green-500 md:col-span-2">
+            Post created successfully!
+          </div>
         )}
       </form>
     </div>
