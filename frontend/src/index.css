@@ -20,28 +20,27 @@
     inset -6px -6px 10px rgba(255, 255, 255, 0.1);
 }
 
-/* Optional: Add a dark mode background for the card */
 .bg-slate-800 {
   background-color: #1e293b;
-  /* Dark background */
+
 }
 
 .bg-slate-900 {
   background-color: #0f172a;
-  /* Darker background */
+
 }
 
 .text-yellow-400 {
   color: #fbbf24;
-  /* Yellow text */
+
 }
 
 .text-gray-300 {
   color: #d1d5db;
-  /* Light gray text */
+
 }
 
 .text-gray-400 {
   color: #9ca3af;
-  /* Darker gray text */
+
 }

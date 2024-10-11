@@ -1,12 +1,24 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { getPostById } from "@/api/posts";
+import { useParams, useNavigate } from "react-router-dom";
+import { getPostById, deletePost } from "@/api/posts";
 import { getUserInfo } from "@/api/users";
-import { deletePost } from "@/api/posts"; // Import the deletePost function
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function PostDetail() {
   const { id: postId } = useParams<{ id: string }>();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
 
   const {
     data: post,
@@ -55,18 +67,16 @@ export default function PostDetail() {
   const isOwner = post?.seller === currentUser?.id;
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      try {
-        const token = localStorage.getItem("token");
-        if (token && postId) {
-          await deletePost(token, postId);
-          navigate("/");
-        } else {
-          console.error("Token is null or undefined");
-        }
-      } catch (error) {
-        console.error("Error deleting post:", error);
+    try {
+      const token = localStorage.getItem("jwt");
+      if (token && postId) {
+        await deletePost(token, postId);
+        navigate("/");
+      } else {
+        console.error("Token is null or undefined");
       }
+    } catch (error) {
+      console.error("Error deleting post:", error);
     }
   };
 
@@ -131,7 +141,7 @@ export default function PostDetail() {
             <div>No additional images available</div>
           )}
         </div>
-        <div>{seller.username}</div>
+        {seller && <div className="mt-2">Seller: {seller.username}</div>}
       </div>
 
       {isOwner && (
@@ -143,13 +153,44 @@ export default function PostDetail() {
             Edit
           </button>
           <button
-            onClick={handleDelete}
+            onClick={() => setIsDialogOpen(true)}
             className="bg-red-500 text-white px-4 py-2 rounded"
           >
             Delete
           </button>
         </div>
       )}
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogTrigger />
+        <AlertDialogContent className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-gray-900 dark:text-white">
+              Confirm Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-700 dark:text-gray-300">
+              <span>
+                Are you sure you want to delete this post? This action cannot be
+                undone.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => setIsDialogOpen(false)}
+              className="bg-gray-300 text-gray-800 dark:bg-gray-600 dark:text-white rounded px-4 py-2"
+            >
+              <span>Cancel</span>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-500 text-white rounded px-4 py-2 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+            >
+              <span>Delete</span>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

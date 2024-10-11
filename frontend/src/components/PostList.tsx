@@ -58,7 +58,6 @@ const PostList: React.FC<PostListProps> = ({
                 />
               </PaginationItem>
 
-              {/* Render page numbers */}
               {Array.from({ length: totalPages }, (_, i) => (
                 <PaginationItem key={i + 1}>
                   <button

@@ -3,19 +3,40 @@ export enum VehicleType {
   Motorcycle = "motorcycle",
 }
 
+// export interface PostProps {
+//   _id?: string;
+//   title: string;
+//   seller: string;
+//   description?: string;
+//   price: number;
+//   vehicleType: VehicleType;
+//   year: number;
+//   mileage?: number;
+//   location: string;
+//   contactInfo: string;
+//   images?: string[];
+//   createdAt: string;
+// }
+
 export interface PostProps {
   _id?: string;
   title: string;
-  seller: string;
-  description?: string;
+  description: string;
   price: number;
-  vehicleType: VehicleType;
+  vehicleType: string;
   year: number;
   mileage?: number;
   location: string;
   contactInfo: string;
-  images?: string[];
-  createdAt: string;
+  images: string[];
+  seller?: string;
+  createdAt?: string;
+}
+
+export interface InvalidateQueryFilters {
+  queryKey: string[];
+  staleTime?: number;
+  cacheTime?: number;
 }
 
 export interface PostListProps {

@@ -9,8 +9,9 @@ import MainPage from "./pages/MainPage";
 import Layout from "./components/Layout";
 import CreatePost from "./components/CreatePost";
 import PostDetail from "./components/PostDetail.tsx";
-import { LogOut } from "lucide-react";
+
 import Logout from "./pages/Logout.tsx";
+import EditPost from "./components/EditPost.tsx";
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -41,14 +42,10 @@ const router = createBrowserRouter([
             path: "create",
             element: <CreatePost />,
           },
-          // {
-          //   path: ":id/edit",
-          //   element: <EditPost />,
-          // },
-          // {
-          //   path: ":id/delete",
-          //   element: <DeletePost />,
-          // },
+          {
+            path: ":id/edit",
+            element: <EditPost />,
+          },
           {
             path: ":id",
             element: <PostDetail />,
