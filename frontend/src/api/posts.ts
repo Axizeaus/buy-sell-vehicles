@@ -44,6 +44,32 @@ export const getPosts = async (
   }
 };
 
+export const getPostById = async (postId: string): Promise<PostProps> => {
+  console.log("Fetching post with ID:", postId);
+
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/posts/${postId}`
+    );
+
+    if (!res.ok) {
+      throw new Error(`Error fetching post: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+
+    if (typeof data !== "object" || !data) {
+      throw new Error("Invalid response format: expected an object.");
+    }
+
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error("Error in getPostById:", error);
+    throw new Error("Failed to fetch post. Please try again later.");
+  }
+};
+
 export const createPost = async (token: string, post: PostProps) => {
   console.log(post);
   const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/posts`, {

@@ -8,6 +8,7 @@ import { Login } from "./pages/Login";
 import MainPage from "./pages/MainPage";
 import Layout from "./components/Layout";
 import CreatePost from "./components/CreatePost";
+import PostDetail from "./components/PostDetail.tsx";
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -42,10 +43,10 @@ const router = createBrowserRouter([
           //   path: ":id/delete",
           //   element: <DeletePost />,
           // },
-          // {
-          //   path: ":id",
-          //   element: <PostDetail />,
-          // },
+          {
+            path: ":id",
+            element: <PostDetail />,
+          },
         ],
       },
     ],
