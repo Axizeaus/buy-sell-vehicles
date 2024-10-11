@@ -52,12 +52,16 @@ export const login = async ({
 };
 
 export const logout = () => {
-  try {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
+  return new Promise<void>((resolve, reject) => {
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      resolve();
+    } catch (error) {
+      console.error("Logout error:", error);
+      reject(error);
+    }
+  });
 };
 
 export const getUserInfo = async (id: string) => {

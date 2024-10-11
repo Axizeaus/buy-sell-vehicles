@@ -4,7 +4,7 @@ import ModeToggle from "./ModeToggle";
 import { useNavigate } from "react-router-dom";
 
 export function Header() {
-  const [token, user, setToken, setUser] = useAuth();
+  const [token, user] = useAuth();
   const navigate = useNavigate();
   return (
     <header className="flex justify-between items-center p-4 bg-gray-100 text-black dark:bg-gray-900 dark:text-gray-100">
@@ -21,16 +21,13 @@ export function Header() {
             <span className="mr-4 border-solid border-green-500 border-y-2 mx-4">
               {user?.username}
             </span>
-            <button
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
-              onClick={() => {
-                // navigate("/");
-                setToken(null);
-                setUser(null);
-                // logout();
-              }}
-            >
-              Logout
+            <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
+              <Link
+                to="/logout"
+                className="flex items-center justify-center w-full h-full"
+              >
+                Logout
+              </Link>
             </button>
           </>
         ) : (
