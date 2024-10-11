@@ -34,11 +34,10 @@ export async function loginUser({ username, password }) {
 }
 
 export async function getUserInfoById(userId) {
-  console.log(userId);
   try {
     const user = await User.findById(userId);
     if (!user) return null;
-    return { username: user.username };
+    return { username: user.username, userId: user.id };
   } catch (err) {
     console.error(err);
     return null;

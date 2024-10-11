@@ -51,8 +51,16 @@ export const login = async ({
   }
 };
 
+export const logout = () => {
+  try {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
+
 export const getUserInfo = async (id: string) => {
-  console.log("id: ", id);
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
       method: "GET",
