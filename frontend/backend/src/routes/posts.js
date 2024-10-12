@@ -5,6 +5,7 @@ import {
   getAllPosts,
   updatePost,
   deletePost,
+  getPostByUser,
 } from "../services/post.js";
 import { requireAuth } from "../middleware/jwt.js";
 
@@ -64,6 +65,19 @@ router.delete("/:id", requireAuth, async (req, res) => {
     res.status(200).json(deletedPost);
   } catch (error) {
     res.status(404).json({ error: error.message });
+  }
+});
+
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const sellerId = req.params.userId;
+    const posts = await getPostByUser(sellerId);
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ error: "No posts found for this user" });
+    }
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

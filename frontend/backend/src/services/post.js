@@ -42,6 +42,18 @@ export async function getPostById(postId) {
   }
 }
 
+export async function getPostByUser(userId) {
+  try {
+    const posts = await Post.find({
+      seller: userId,
+    }).exec();
+    return posts;
+  } catch (err) {
+    console.error("Error retrieving posts by user: " + err);
+    throw new Error("Could not fetch posts. Please try again later.");
+  }
+}
+
 export async function getAllPosts({
   sortBy = "createdAt",
   sortOrder = "descending",
@@ -69,10 +81,8 @@ export async function getAllPosts({
 
     const sortOptions = { [sortBy]: sortOrder === "ascending" ? 1 : -1 };
 
-    // Fetch all posts without pagination
     const postList = await Post.find(filterCriteria).sort(sortOptions);
 
-    // Count total posts matching the criteria
     const totalPosts = await Post.countDocuments(filterCriteria);
 
     return { posts: postList || [], totalPosts };

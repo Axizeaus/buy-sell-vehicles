@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 export function Header() {
   const [token, user] = useAuth();
   const navigate = useNavigate();
+
+  const userProfileLink = `/user/${user?.id}`;
   return (
     <header className="flex justify-between items-center p-4 bg-gray-100 text-black dark:bg-gray-900 dark:text-gray-100">
       <h1
@@ -18,9 +20,13 @@ export function Header() {
         <ModeToggle />
         {token ? (
           <>
-            <span className="mr-4 border-solid border-green-500 border-y-2 mx-4">
+            <Link
+              to={userProfileLink}
+              className="mr-4 border-solid border-green-500 border-y-2 mx-4"
+            >
               {user?.username}
-            </span>
+            </Link>
+
             <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">
               <Link
                 to="/logout"

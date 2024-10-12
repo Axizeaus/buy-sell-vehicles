@@ -1,5 +1,5 @@
-import { PostProps } from "@/types"; // Ensure PostProps is defined in your types file
-import TiltCard from "@/components/ui/tilt-card"; // Adjust the import path as necessary
+import { PostProps } from "@/types";
+import TiltCard from "@/components/ui/tilt-card";
 
 const PLACEHOLDER_IMAGE = "https://via.placeholder.com/150";
 

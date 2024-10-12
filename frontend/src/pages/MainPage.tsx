@@ -45,7 +45,6 @@ export default function MainPage() {
     ],
     queryFn: async () => {
       const response = await getPosts(queryParams);
-      console.log("API Response:", response);
       return response;
     },
     enabled: true,
