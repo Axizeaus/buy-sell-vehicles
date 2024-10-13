@@ -1,34 +1,31 @@
-{
-  "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
-  "type": "module",
-  "scripts": {
-    "test": "jest",
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "express-jwt": "^8.4.1",
-    "faker": "^6.6.6",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.7.1",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@babel/preset-env": "^7.25.4",
-    "babel-jest": "^29.7.0",
-    "eslint": "^9.11.1",
-    "jest": "^29.7.0",
-    "mongodb-memory-server": "^10.0.1",
-    "nodemon": "^3.1.7"
-  }
-}
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20' # Specify the Node.js version you want to use
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: backend 
+
+    - name: Run tests
+      run: npm test
+      working-directory: backend 
