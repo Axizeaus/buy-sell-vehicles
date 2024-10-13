@@ -1,14 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "../api/users.js";
 import { getPostByUser } from "../api/posts.js";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import PostList from "@/components/PostList.js";
 import { useState } from "react";
 
 export default function UserProfile() {
   const { userId } = useParams();
-
-  console.log(userId);
 
   const userQuery = useQuery({
     queryKey: ["users", userId],
@@ -28,11 +26,9 @@ export default function UserProfile() {
     isLoading: postsLoading,
   } = postsQuery;
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 10; // Set the number of posts per page
+  const postsPerPage = 8;
 
-  // Calculate total posts and slice the posts for the current page
   const totalPosts = posts?.length || 0;
   const paginatedPosts =
     posts?.slice(
@@ -58,22 +54,50 @@ export default function UserProfile() {
   if (postsLoading) return <strong>Loading posts...</strong>;
   if (postsError) return <strong>Error fetching posts</strong>;
 
-  console.log(posts);
-
   return (
-    <div>
-      <h1>User Profile</h1>
-      <strong>{user?.username ?? userId}</strong>
-      <h2>Posts</h2>
-      <PostList
-        posts={paginatedPosts}
-        totalPosts={totalPosts}
-        onNextPage={onNextPage}
-        onPreviousPage={onPreviousPage}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        postsPerPage={postsPerPage}
-      />
+    <div className="flex flex-col md:flex-row">
+      <div className="w-full md:w-1/4 p-6 border-b md:border-b-0 md:border-r border-gray-300">
+        <h1>User Profile</h1>
+        <strong>{user?.username}</strong>
+        <div className="mt-4">
+          <h2>Location</h2>
+          <p>
+            {user?.location?.city}, {user?.location?.state}
+          </p>
+        </div>
+        <div className="mt-4">
+          <h2>Contact Info</h2>
+          <p>Email: {user?.contactInfo?.email}</p>
+          <p>Phone: {user?.contactInfo?.phone}</p>
+        </div>
+        <div className="mt-4">
+          <h2>Miscellaneous</h2>
+          <p>{user?.miscellaneous}</p>
+        </div>
+        <Link
+          to={`/user/${userId}/edit`}
+          className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded"
+        >
+          Edit User
+        </Link>
+        <Link
+          to={`/user/${userId}/delete`}
+          className="mt-4 inline-block text-red-500"
+        >
+          Delete User
+        </Link>
+      </div>
+      <div className="w-full md:w-3/4 p-6">
+        <PostList
+          posts={paginatedPosts}
+          totalPosts={totalPosts}
+          onNextPage={onNextPage}
+          onPreviousPage={onPreviousPage}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          postsPerPage={postsPerPage}
+        />
+      </div>
     </div>
   );
 }

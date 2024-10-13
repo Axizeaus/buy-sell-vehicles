@@ -74,6 +74,8 @@ export default function MainPage() {
     currentPage * postsPerPage
   );
 
+  console.log("Paginated Posts:", paginatedPosts);
+
   if (isLoading) return <div>Loading posts...</div>;
   if (isError) return <div>Error loading posts: {error.message}</div>;
 

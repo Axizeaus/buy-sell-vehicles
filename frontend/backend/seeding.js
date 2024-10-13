@@ -2,7 +2,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import { Post } from "./src/db/models/post.js";
 
-const sellerId = new mongoose.Types.ObjectId("6706a76ab7e17dce6146ced6");
+const sellerId = new mongoose.Types.ObjectId("670b57f6426915eb29c9ea19");
 
 const locations = [
   "Lashio",
@@ -15,10 +15,8 @@ const locations = [
   "Pathein",
 ];
 
-// Function to generate a random vehicle title
 const generateVehicleTitle = (index) => `Vehicle ${index + 1}`;
 
-// Function to generate a random description
 const generateDescription = () => {
   const descriptions = [
     "A reliable vehicle for all your needs.",
@@ -30,25 +28,24 @@ const generateDescription = () => {
   return descriptions[Math.floor(Math.random() * descriptions.length)];
 };
 
-// Function to generate a random phone number
 const generatePhoneNumber = () => {
-  const areaCode = Math.floor(Math.random() * 900) + 100; // Random area code
-  const number = Math.floor(Math.random() * 9000000) + 1000000; // Random 7-digit number
+  const areaCode = Math.floor(Math.random() * 900) + 100;
+  const number = Math.floor(Math.random() * 9000000) + 1000000;
   return `(${areaCode}) ${number}`;
 };
 
 // Generate posts
 const posts = Array.from({ length: 30 }, (_, index) => ({
-  title: generateVehicleTitle(index), // Generate a vehicle name
-  description: generateDescription(), // Generate a random description
-  price: Math.floor(Math.random() * 1000), // Random price between 1000 and 10000
-  vehicleType: index % 2 === 0 ? "car" : "motorcycle", // Alternate between car and motorcycle
-  year: Math.floor(Math.random() * (2024 - 2010 + 1)) + 2010, // Random year between 2010 and 2024
-  mileage: Math.floor(Math.random() * (100000 - 1000 + 1)) + 1000, // Random mileage between 1000 and 100000
-  location: locations[Math.floor(Math.random() * locations.length)], // Randomly select a location
-  contactInfo: generatePhoneNumber(), // Generate a random phone number
+  title: generateVehicleTitle(index),
+  description: generateDescription(),
+  price: Math.floor(Math.random() * 1000),
+  vehicleType: index % 2 === 0 ? "car" : "motorcycle",
+  year: Math.floor(Math.random() * (2024 - 2010 + 1)) + 2010,
+  mileage: Math.floor(Math.random() * (100000 - 1000 + 1)) + 1000,
+  location: locations[Math.floor(Math.random() * locations.length)],
+  contactInfo: generatePhoneNumber(),
   images: [
-    "https://via.placeholder.com/150", // Placeholder image URL
+    "https://via.placeholder.com/150",
     "https://via.placeholder.com/150",
     "https://via.placeholder.com/150",
   ],
@@ -63,7 +60,7 @@ async function seedDatabase() {
     await mongoose.connect(process.env.DATABASE_URL);
 
     console.log("Clearing existing posts...");
-    await Post.deleteMany({}); // Clear existing posts if needed
+    await Post.deleteMany({});
 
     console.log("Inserting new posts...");
     const result = await Post.insertMany(posts);

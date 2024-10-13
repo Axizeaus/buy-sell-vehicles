@@ -1,15 +1,27 @@
 export const signup = async ({
   username,
   password,
+  location, // Optional
+  contactInfo, // Optional
+  miscellaneous, // Optional
 }: {
   username: string;
   password: string;
+  location?: { city?: string; state?: string; country?: string };
+  contactInfo?: { email?: string; phone?: string };
+  miscellaneous?: string;
 }) => {
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({
+        username,
+        password,
+        location,
+        contactInfo,
+        miscellaneous,
+      }),
     });
 
     if (!res.ok) {
@@ -42,9 +54,10 @@ export const login = async ({
       const errorMessage = await res.text();
       throw new Error(`Failed to login: ${errorMessage}`);
     }
+
     const data = await res.json();
     console.log(data);
-    return await data;
+    return data;
   } catch (error) {
     console.error("Login error:", error);
     throw error;
@@ -78,9 +91,84 @@ export const getUserInfo = async (id: string) => {
       throw new Error(`Failed to fetch user info: ${errorMessage}`);
     }
 
-    return await res.json();
+    const data = await res.json();
+
+    console.log(JSON.stringify(data));
+    return data;
   } catch (error) {
     console.error("Get user info error:", error);
+    throw error;
+  }
+};
+
+// Optional: Add updateUser function
+export const updateUser = async (
+  id: string,
+  props: {
+    username?: string;
+    password?: string;
+    location?: { city?: string; state?: string; country?: string };
+    contactInfo?: { email?: string; phone?: string };
+    miscellaneous?: string;
+  }
+) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(props),
+    });
+
+    if (!res.ok) {
+      const errorMessage = await res.text();
+      throw new Error(`Failed to update user: ${errorMessage}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Update user error:", error);
+    throw error;
+  }
+};
+
+// Optional: Add deleteUser function
+export const deleteUser = async (id: string) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      const errorMessage = await res.text();
+      throw new Error(`Failed to delete user: ${errorMessage}`);
+    }
+
+    return; // No content to return on successful deletion
+  } catch (error) {
+    console.error("Delete user error:", error);
+    throw error;
+  }
+};
+
+// Optional: Add getAllUsers function
+export const getAllUsers = async () => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorMessage = await res.text();
+      throw new Error(`Failed to fetch users: ${errorMessage}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Get all users error:", error);
     throw error;
   }
 };

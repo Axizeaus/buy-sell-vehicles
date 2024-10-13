@@ -3,21 +3,6 @@ export enum VehicleType {
   Motorcycle = "motorcycle",
 }
 
-// export interface PostProps {
-//   _id?: string;
-//   title: string;
-//   seller: string;
-//   description?: string;
-//   price: number;
-//   vehicleType: VehicleType;
-//   year: number;
-//   mileage?: number;
-//   location: string;
-//   contactInfo: string;
-//   images?: string[];
-//   createdAt: string;
-// }
-
 export interface PostProps {
   _id?: string;
   title: string;
@@ -46,4 +31,14 @@ export interface PostListProps {
 export interface User {
   id: string;
   username: string;
+  password: string;
+  location?: {
+    city?: string;
+    state?: string;
+  };
+  contactInfo?: {
+    email?: string;
+    phone?: string;
+  };
+  miscellaneous?: string;
 }
