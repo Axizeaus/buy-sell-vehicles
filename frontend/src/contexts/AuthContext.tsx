@@ -22,11 +22,6 @@ interface AuthContextProviderProps {
   children: ReactNode;
 }
 
-// const defaultUser: User = {
-//   id: "0",
-//   username: "John Doe",
-// };
-
 const defaultContextValue: AuthContextType = {
   token: null,
   setToken: () => {},

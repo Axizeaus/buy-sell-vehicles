@@ -1,9 +1,17 @@
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("jwt");
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
 export const signup = async ({
   username,
   password,
-  location, // Optional
-  contactInfo, // Optional
-  miscellaneous, // Optional
+  location,
+  contactInfo,
+  miscellaneous,
 }: {
   username: string;
   password: string;
@@ -26,7 +34,11 @@ export const signup = async ({
 
     if (!res.ok) {
       const errorMessage = await res.text();
-      throw new Error(`Failed to sign up: ${errorMessage}`);
+      console.error(`Signup failed with status ${res.status}: ${errorMessage}`);
+      throw {
+        status: res.status,
+        message: errorMessage,
+      };
     }
 
     return await res.json();
@@ -46,7 +58,7 @@ export const login = async ({
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ username, password }),
     });
 
@@ -56,7 +68,6 @@ export const login = async ({
     }
 
     const data = await res.json();
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Login error:", error);
@@ -67,7 +78,7 @@ export const login = async ({
 export const logout = () => {
   return new Promise<void>((resolve, reject) => {
     try {
-      localStorage.removeItem("token");
+      localStorage.removeItem("jwt");
       localStorage.removeItem("user");
       resolve();
     } catch (error) {
@@ -81,19 +92,18 @@ export const getUserInfo = async (id: string) => {
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     });
+
+    const data = await res.json();
+
+    console.log(JSON.stringify(data));
 
     if (!res.ok) {
       const errorMessage = await res.text();
       throw new Error(`Failed to fetch user info: ${errorMessage}`);
     }
 
-    const data = await res.json();
-
-    console.log(JSON.stringify(data));
     return data;
   } catch (error) {
     console.error("Get user info error:", error);
@@ -101,7 +111,6 @@ export const getUserInfo = async (id: string) => {
   }
 };
 
-// Optional: Add updateUser function
 export const updateUser = async (
   id: string,
   props: {
@@ -115,7 +124,7 @@ export const updateUser = async (
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(props),
     });
 
@@ -131,12 +140,11 @@ export const updateUser = async (
   }
 };
 
-// Optional: Add deleteUser function
 export const deleteUser = async (id: string) => {
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     });
 
     if (!res.ok) {
@@ -144,14 +152,13 @@ export const deleteUser = async (id: string) => {
       throw new Error(`Failed to delete user: ${errorMessage}`);
     }
 
-    return; // No content to return on successful deletion
+    return;
   } catch (error) {
     console.error("Delete user error:", error);
     throw error;
   }
 };
 
-// Optional: Add getAllUsers function
 export const getAllUsers = async () => {
   try {
     const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user`, {
@@ -169,6 +176,38 @@ export const getAllUsers = async () => {
     return await res.json();
   } catch (error) {
     console.error("Get all users error:", error);
+    throw error;
+  }
+};
+
+export const searchUsersByUsername = async (username: string) => {
+  try {
+    const URL = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/user/search?username=${encodeURIComponent(username)}`;
+    console.log(URL);
+    const res = await fetch(
+      `${
+        import.meta.env.VITE_BACKEND_URL
+      }/user/search?username=${encodeURIComponent(username)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!res.ok) {
+      const errorMessage = await res.text();
+      throw new Error(`Failed to search users: ${errorMessage}`);
+    }
+    const data = await res.json();
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.error("Search users error:", error);
     throw error;
   }
 };

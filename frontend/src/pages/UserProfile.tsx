@@ -7,6 +7,7 @@ import { useState } from "react";
 
 export default function UserProfile() {
   const { userId } = useParams();
+  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   const userQuery = useQuery({
     queryKey: ["users", userId],
@@ -54,6 +55,8 @@ export default function UserProfile() {
   if (postsLoading) return <strong>Loading posts...</strong>;
   if (postsError) return <strong>Error fetching posts</strong>;
 
+  const isCurrentUser = localUser.id === userId;
+
   return (
     <div className="flex flex-col md:flex-row">
       <div className="w-full md:w-1/4 p-6 border-b md:border-b-0 md:border-r border-gray-300">
@@ -74,18 +77,22 @@ export default function UserProfile() {
           <h2>Miscellaneous</h2>
           <p>{user?.miscellaneous}</p>
         </div>
-        <Link
-          to={`/user/${userId}/edit`}
-          className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          Edit User
-        </Link>
-        <Link
-          to={`/user/${userId}/delete`}
-          className="mt-4 inline-block text-red-500"
-        >
-          Delete User
-        </Link>
+        {isCurrentUser && (
+          <>
+            <Link
+              to={`/user/${userId}/edit`}
+              className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded"
+            >
+              Edit User
+            </Link>
+            <Link
+              to={`/user/${userId}/delete`}
+              className="mt-4 inline-block text-red-500"
+            >
+              Delete User
+            </Link>
+          </>
+        )}
       </div>
       <div className="w-full md:w-3/4 p-6">
         <PostList

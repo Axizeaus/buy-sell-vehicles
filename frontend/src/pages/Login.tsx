@@ -8,9 +8,7 @@ import AuthForm from "@/components/AuthForm.js";
 
 export function Login() {
   const navigate = useNavigate();
-  const [token, user, setToken, setUser] = useAuth();
-
-  console.log(token, user);
+  const [, , setToken, setUser] = useAuth();
 
   const loginMutation = useMutation({
     mutationFn: (data: { username: string; password: string }) => login(data),

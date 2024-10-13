@@ -12,6 +12,7 @@ interface QueryParams {
   postsPerPage?: string;
   [key: string]: string | undefined;
 }
+
 export const getPosts = async (
   queryParams: QueryParams = {}
 ): Promise<{ posts: PostProps[]; totalPosts: number }> => {
@@ -29,7 +30,6 @@ export const getPosts = async (
 
     const data = await res.json();
 
-    // Ensure the response is in the expected format
     if (!Array.isArray(data.posts) || typeof data.totalPosts !== "number") {
       throw new Error(
         "Invalid response format: expected an object with posts and totalPosts."
@@ -37,7 +37,7 @@ export const getPosts = async (
     }
 
     console.log(data);
-    return data; // Return the entire data object containing posts and totalPosts
+    return data;
   } catch (error) {
     console.error("Error in getPosts:", error);
     throw new Error("Failed to fetch posts. Please try again later.");

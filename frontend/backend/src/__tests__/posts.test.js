@@ -9,6 +9,7 @@ import { Post } from "../db/models/post.js";
 import { z } from "zod";
 
 jest.mock("../db/models/post.js");
+
 describe("Post Service Functions", () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -76,11 +77,7 @@ describe("Post Service Functions", () => {
       const mockPosts = [{ title: "Post 1" }, { title: "Post 2" }];
       const mockTotalPosts = mockPosts.length; // Total posts count
       Post.find.mockReturnValue({
-        sort: jest.fn().mockReturnValue({
-          skip: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValueOnce(mockPosts),
-          }),
-        }),
+        sort: jest.fn().mockResolvedValueOnce(mockPosts),
       });
       Post.countDocuments.mockResolvedValueOnce(mockTotalPosts); // Mock total count
 
@@ -95,11 +92,7 @@ describe("Post Service Functions", () => {
       const mockPosts = [{ title: "Post 1" }];
       const mockTotalPosts = mockPosts.length; // Total posts count
       Post.find.mockReturnValue({
-        sort: jest.fn().mockReturnValue({
-          skip: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValueOnce(mockPosts),
-          }),
-        }),
+        sort: jest.fn().mockResolvedValueOnce(mockPosts),
       });
       Post.countDocuments.mockResolvedValueOnce(mockTotalPosts); // Mock total count
 

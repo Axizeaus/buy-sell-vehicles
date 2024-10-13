@@ -17,6 +17,7 @@ interface AuthFormProps {
   buttonText: string;
   linkText: string;
   linkTo: string;
+  errorMessage?: string; // New prop for error message
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -26,6 +27,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   buttonText,
   linkText,
   linkTo,
+  errorMessage, // Destructure the new prop
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -55,6 +57,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
               Back to main page
             </Link>
             <hr className="my-4" />
+
             <div>
               <input
                 type="text"
@@ -82,6 +85,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
             >
               {buttonText}
             </Button>
+            {errorMessage && (
+              <div className="p-3 rounded-lg bg-red-50 border border-red-300 text-center text-red-700">
+                <p className="text-xs font-medium">{errorMessage}</p>
+              </div>
+            )}
           </form>
         </CardContent>
         <CardFooter>

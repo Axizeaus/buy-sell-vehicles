@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPostById, deletePost } from "@/api/posts";
+import { Link } from "react-router-dom";
 import { getUserInfo } from "@/api/users";
 import {
   AlertDialog,
@@ -18,8 +19,7 @@ import {
 export default function PostDetail() {
   const { id: postId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const {
     data: post,
     error,
@@ -63,6 +63,8 @@ export default function PostDetail() {
   if (error) return <div>Error: {error.message}</div>;
   if (isSellerLoading) return <div>Loading seller...</div>;
   if (sellerError) return <div>Seller Error: {sellerError.message}</div>;
+
+  console.log(seller.userId);
 
   const isOwner = post?.seller === currentUser?.id;
 
@@ -141,7 +143,17 @@ export default function PostDetail() {
             <div>No additional images available</div>
           )}
         </div>
-        {seller && <div className="mt-2">Seller: {seller.username}</div>}
+        {seller && (
+          <div className="mt-2">
+            Seller:
+            <Link
+              to={`/user/${seller.userId}`}
+              className="text-blue-500 hover:underline"
+            >
+              {seller.username}
+            </Link>
+          </div>
+        )}
       </div>
 
       {isOwner && (

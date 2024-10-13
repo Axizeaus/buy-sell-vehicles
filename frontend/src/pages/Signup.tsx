@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react"; // Import useState
 
 import { signup } from "@/api/users";
-
 import AuthForm from "@/components/AuthForm";
 
 interface Location {
@@ -26,11 +26,24 @@ interface SignupData {
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const signupMutation = useMutation({
     mutationFn: (data: SignupData) => signup(data),
-    onSuccess: () => navigate("/login"),
-    onError: () => alert("Failed to sign up!"),
+    onSuccess: () => {
+      setErrorMessage(null);
+      navigate("/login");
+    },
+    onError: (error: any) => {
+      const errmsg = JSON.parse(error.message);
+      console.log(errmsg.details);
+
+      if (errmsg.details) {
+        setErrorMessage(errmsg.details);
+      } else {
+        setErrorMessage("Failed to sign up!");
+      }
+    },
   });
 
   const handleSignupSubmit = (data: SignupData) => {
@@ -38,28 +51,30 @@ export default function Signup() {
       username: data.username,
       password: data.password,
       location: {
-        city: data.location?.city || "N/A",
-        state: data.location?.state || "N/A",
-        country: data.location?.country || "N/A",
+        city: data.location?.city || undefined,
+        state: data.location?.state || undefined,
       },
       contactInfo: {
-        email: data.contactInfo?.email || "N/A",
-        phone: data.contactInfo?.phone || "N/A",
+        email: data.contactInfo?.email || undefined,
+        phone: data.contactInfo?.phone || undefined,
       },
-      miscellaneous: data.miscellaneous || "N/A",
+      miscellaneous: data.miscellaneous || undefined,
     };
 
     signupMutation.mutate(signupData);
   };
 
   return (
-    <AuthForm
-      title="Sign Up"
-      description="Create a new account"
-      onSubmit={handleSignupSubmit}
-      buttonText="Sign Up"
-      linkText="Already have an account?"
-      linkTo="/login"
-    />
+    <div>
+      <AuthForm
+        title="Sign Up"
+        description="Create a new account"
+        onSubmit={handleSignupSubmit}
+        buttonText="Sign Up"
+        linkText="Already have an account?"
+        linkTo="/login"
+        errorMessage={errorMessage!}
+      />
+    </div>
   );
 }
