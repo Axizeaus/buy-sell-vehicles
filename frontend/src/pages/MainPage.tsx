@@ -19,7 +19,7 @@ export default function MainPage() {
   const navigate = useNavigate();
   const [token] = useAuth();
 
-  const postsPerPage = 8;
+  const postsPerPage = 6;
 
   const queryParams = {
     sortBy,

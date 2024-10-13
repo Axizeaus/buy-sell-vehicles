@@ -1,5 +1,5 @@
 import { PostProps } from "@/types";
-import TiltCard from "@/components/ui/tilt-card";
+import TiltCard from "@/components/ui/post-card";
 
 const PLACEHOLDER_IMAGE = "https://via.placeholder.com/150";
 

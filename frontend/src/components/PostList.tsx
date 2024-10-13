@@ -6,6 +6,8 @@ import {
   PaginationItem,
   PaginationPrevious,
   PaginationNext,
+  PaginationLink,
+  PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { Link } from "react-router-dom";
 
@@ -29,10 +31,42 @@ const PostList: React.FC<PostListProps> = ({
   postsPerPage,
 }) => {
   const totalPages = Math.ceil(totalPosts / postsPerPage);
+  const maxVisibleButtons = 5;
+
+  const getPaginationItems = () => {
+    const items = [];
+    let startPage = Math.max(
+      1,
+      currentPage - Math.floor(maxVisibleButtons / 2)
+    );
+    let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+    if (endPage - startPage < maxVisibleButtons - 1) {
+      startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+    }
+
+    if (startPage > 1) {
+      items.push(1);
+      if (startPage > 2)
+        items.push(<PaginationEllipsis key="ellipsis-start" />);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(i);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1)
+        items.push(<PaginationEllipsis key="ellipsis-end" />);
+      items.push(totalPages);
+    }
+
+    return items;
+  };
 
   return (
     <div className="p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.length > 0 ? (
           posts.map((post) => (
             <Link key={post._id} to={`/posts/${post._id}`}>
@@ -51,30 +85,37 @@ const PostList: React.FC<PostListProps> = ({
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
+                  href="#"
+                  onClick={currentPage === 1 ? undefined : onPreviousPage}
                   className={
                     currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
                   }
-                  onClick={currentPage === 1 ? undefined : onPreviousPage}
                 />
               </PaginationItem>
 
-              {Array.from({ length: totalPages }, (_, i) => (
-                <PaginationItem key={i + 1}>
-                  <button
-                    className={`px-3 py-1 rounded ${
-                      currentPage === i + 1
-                        ? "bg-gray-500 text-white"
-                        : "text-gray-500"
-                    }`}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </button>
+              {getPaginationItems().map((item, index) => (
+                <PaginationItem key={index}>
+                  {typeof item === "number" ? (
+                    <PaginationLink
+                      href="#"
+                      onClick={() => setCurrentPage(item)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === item
+                          ? "bg-gray-500 text-white"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {item}
+                    </PaginationLink>
+                  ) : (
+                    item
+                  )}
                 </PaginationItem>
               ))}
 
               <PaginationItem>
                 <PaginationNext
+                  href="#"
                   onClick={currentPage < totalPages ? onNextPage : undefined}
                   className={
                     currentPage < totalPages

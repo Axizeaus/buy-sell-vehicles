@@ -1,7 +1,7 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 import { Post } from "./src/db/models/post.js";
-import User from "./src/db/models/user.js"; // Import the User model
+import User from "./src/db/models/user.js";
 
 const locations = [
   "Lashio",
@@ -33,7 +33,6 @@ const generatePhoneNumber = () => {
   return `(${areaCode}) ${number}`;
 };
 
-// Generate posts for a given sellerId
 const generatePosts = (sellerId, postCount) => {
   return Array.from({ length: postCount }, (_, index) => ({
     title: generateVehicleTitle(index),
@@ -65,17 +64,17 @@ async function seedDatabase() {
     console.log("Clearing existing users...");
     await User.deleteMany({});
 
-    const userCount = 5; // Number of users to create
-    const postsPerUser = 6; // Number of posts per user
+    const userCount = 5;
+    const postsPerUser = 50;
 
     const users = [];
     for (let i = 0; i < userCount; i++) {
       const user = new User({
         username: `user${i + 1}`,
-        password: `password${i + 1}`, // Make sure to hash passwords in a real application
+        password: `password${i + 1}`,
         location: {
           city: locations[Math.floor(Math.random() * locations.length)],
-          state: "Yangon Region", // You can modify this as needed
+          state: "Yangon Region",
         },
         contactInfo: {
           email: `user${i + 1}@example.com`,
@@ -100,7 +99,7 @@ async function seedDatabase() {
     const result = await Post.insertMany(allPosts);
     console.log(`${result.length} posts inserted successfully!`);
   } catch (error) {
-    console.error("Error seeding database:", error.message);
+    console.error("Error seeding database:", error);
   } finally {
     await mongoose.disconnect();
     console.log("Database connection closed.");
@@ -108,3 +107,18 @@ async function seedDatabase() {
 }
 
 seedDatabase();
+
+// async function seedDatabase() {
+//   try {
+//     console.log("Connecting to database...");
+//     await mongoose.connect(process.env.DATABASE_URL);
+//     console.log("Connected to database successfully!");
+
+//     // ... rest of your code
+//   } catch (error) {
+//     console.error("Error connecting to the database:", error);
+//     return; // Exit the function if the connection fails
+//   }
+// }
+
+// seedDatabase();

@@ -6,7 +6,7 @@ export default function ModeToggle() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center mr-4 space-x-2">
       <Button
         variant="outline"
         size="icon"

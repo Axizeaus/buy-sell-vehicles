@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { getUserInfo, updateUser } from "../api/users.js";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import TextInput from "./TextInput"; // Import the reusable TextInput component
 
 interface User {
   id: string;
@@ -61,67 +62,60 @@ export default function EditUser() {
   if (userQuery.isError) return <strong>Error fetching user info</strong>;
 
   return (
-    <div>
-      <h1>Edit User</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="max-w-md mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 text-center">
+        Edit User
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <TextInput
+          label="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
         <div>
-          <label>
-            Username:
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </label>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Location
+          </h2>
+          <TextInput
+            label="City"
+            value={location.city || ""}
+            onChange={(e) => setLocation({ ...location, city: e.target.value })}
+          />
+          <TextInput
+            label="State"
+            value={location.state || ""}
+            onChange={(e) =>
+              setLocation({ ...location, state: e.target.value })
+            }
+          />
         </div>
         <div>
-          <h2>Location</h2>
-          <label>
-            City:
-            <input
-              type="text"
-              value={location.city || ""}
-              onChange={(e) =>
-                setLocation({ ...location, city: e.target.value })
-              }
-            />
-          </label>
-          <label>
-            State:
-            <input
-              type="text"
-              value={location.state || ""}
-              onChange={(e) =>
-                setLocation({ ...location, state: e.target.value })
-              }
-            />
-          </label>
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Contact Info
+          </h2>
+          <TextInput
+            label="Email"
+            value={contactInfo.email || ""}
+            onChange={(e) =>
+              setContactInfo({ ...contactInfo, email: e.target.value })
+            }
+            type="email"
+          />
+          <TextInput
+            label="Phone"
+            value={contactInfo.phone || ""}
+            onChange={(e) =>
+              setContactInfo({ ...contactInfo, phone: e.target.value })
+            }
+          />
         </div>
-        <div>
-          <h2>Contact Info</h2>
-          <label>
-            Email:
-            <input
-              type="email"
-              value={contactInfo.email || ""}
-              onChange={(e) =>
-                setContactInfo({ ...contactInfo, email: e.target.value })
-              }
-            />
-          </label>
-          <label>
-            Phone:
-            <input
-              type="text"
-              value={contactInfo.phone || ""}
-              onChange={(e) =>
-                setContactInfo({ ...contactInfo, phone: e.target.value })
-              }
-            />
-          </label>
-        </div>
-        <button type="submit">Update User</button>
+        <button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-md shadow-md transition duration-200 transform hover:scale-105"
+        >
+          Update User
+        </button>
       </form>
     </div>
   );

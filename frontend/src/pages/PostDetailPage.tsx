@@ -144,7 +144,7 @@ export default function PostDetail() {
           )}
         </div>
         {seller && (
-          <div className="mt-2">
+          <div className="mt-2 mr-2">
             Seller:
             <Link
               to={`/user/${seller.userId}`}

@@ -4,6 +4,7 @@ import { getPostByUser } from "../api/posts.js";
 import { useParams, Link } from "react-router-dom";
 import PostList from "@/components/PostList.js";
 import { useState } from "react";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 
 export default function UserProfile() {
   const { userId } = useParams();
@@ -28,7 +29,7 @@ export default function UserProfile() {
   } = postsQuery;
 
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 8;
+  const postsPerPage = 6;
 
   const totalPosts = posts?.length || 0;
   const paginatedPosts =
@@ -59,42 +60,65 @@ export default function UserProfile() {
 
   return (
     <div className="flex flex-col md:flex-row">
-      <div className="w-full md:w-1/4 p-6 border-b md:border-b-0 md:border-r border-gray-300">
-        <h1>User Profile</h1>
-        <strong>{user?.username}</strong>
-        <div className="mt-4">
-          <h2>Location</h2>
-          <p>
-            {user?.location?.city}, {user?.location?.state}
-          </p>
-        </div>
-        <div className="mt-4">
-          <h2>Contact Info</h2>
-          <p>Email: {user?.contactInfo?.email}</p>
-          <p>Phone: {user?.contactInfo?.phone}</p>
-        </div>
-        <div className="mt-4">
-          <h2>Miscellaneous</h2>
-          <p>{user?.miscellaneous}</p>
-        </div>
+      <div className="w-full md:w-1/4 p-6 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col bg-white shadow-lg rounded-lg dark:bg-gray-800 dark:border-gray-700">
+        <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+          User Profile
+        </h1>
+        <strong className="text-xl text-gray-900 dark:text-gray-200">
+          {user?.username}
+        </strong>
+
+        {user.location && Object.keys(user.location).length > 0 && (
+          <div className="mt-4 flex items-center text-gray-700 dark:text-gray-300">
+            <FaMapMarkerAlt className="mr-2 text-gray-600 dark:text-gray-400" />
+            <p>
+              {user.location.city}, {user.location.state}
+            </p>
+          </div>
+        )}
+
+        {user.contactInfo && Object.keys(user.contactInfo).length > 0 && (
+          <div className="mt-4 flex flex-col text-gray-700 dark:text-gray-300">
+            <div className="flex items-center mb-2">
+              <FaEnvelope className="mr-2 text-gray-600 dark:text-gray-400" />
+              <p className="truncate">{user.contactInfo.email}</p>
+            </div>
+            <div className="flex items-center">
+              <FaPhone className="mr-2 text-gray-600 dark:text-gray-400" />
+              <p className="truncate">{user.contactInfo.phone}</p>
+            </div>
+          </div>
+        )}
+
+        {user.miscellaneous && user.miscellaneous !== null && (
+          <div className="mt-4">
+            <h2 className="font-semibold text-gray-800 dark:text-gray-200">
+              Miscellaneous
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300">
+              {user.miscellaneous}
+            </p>
+          </div>
+        )}
+
         {isCurrentUser && (
-          <>
+          <div className="mt-4">
             <Link
               to={`/user/${userId}/edit`}
-              className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded"
+              className="inline-block bg-blue-500 text-white py-2 px-4 rounded transition duration-200 hover:bg-blue-600"
             >
               Edit User
             </Link>
             <Link
               to={`/user/${userId}/delete`}
-              className="mt-4 inline-block text-red-500"
+              className="inline-block text-red-500 ml-4 transition duration-200 hover:text-red-700"
             >
               Delete User
             </Link>
-          </>
+          </div>
         )}
       </div>
-      <div className="w-full md:w-3/4 p-6">
+      <div className="w-full md:w-3/4 px-6">
         <PostList
           posts={paginatedPosts}
           totalPosts={totalPosts}
@@ -104,6 +128,30 @@ export default function UserProfile() {
           setCurrentPage={setCurrentPage}
           postsPerPage={postsPerPage}
         />
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={onPreviousPage}
+            disabled={currentPage === 1}
+            className={`py-2 px-4 bg-gray-300 rounded ${
+              currentPage === 1
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+          >
+            Previous
+          </button>
+          <button
+            onClick={onNextPage}
+            disabled={currentPage >= Math.ceil(totalPosts / postsPerPage)}
+            className={`py-2 px-4 bg-gray-300 rounded ${
+              currentPage >= Math.ceil(totalPosts / postsPerPage)
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-400"
+            }`}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
